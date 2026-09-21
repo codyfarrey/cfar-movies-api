@@ -17,6 +17,7 @@ func NewMovieHandler(db *sql.DB) *MovieHandler {
 }
 
 func (h *MovieHandler) MoviesHandler(rw http.ResponseWriter, req *http.Request) {
+	log.Print("Returning all movies from database...")
 	rows, err := h.DB.Query("SELECT tmdb_id, title, release_date, genres FROM movies")
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -41,16 +42,14 @@ func (h *MovieHandler) MoviesHandler(rw http.ResponseWriter, req *http.Request) 
 }
 
 func (h *MovieHandler) AddMovie(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodPost {
-		http.Error(rw, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	var m models.Movie
 	err := json.NewDecoder(req.Body).Decode(&m)
 
+	log.Printf("Attempting to add movie %s to database", m.Title)
+
 	if err != nil {
 		http.Error(rw, "invalid request", http.StatusBadRequest)
+		log.Print("Request is invalid: ", err)
 		return
 	}
 
@@ -58,7 +57,7 @@ func (h *MovieHandler) AddMovie(rw http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		http.Error(rw, "error writing to database", http.StatusInternalServerError)
-		log.Printf("error writing to database: %s", err)
+		log.Print("error writing to database: ", err)
 		return
 	}
 

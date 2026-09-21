@@ -30,9 +30,9 @@ func main() {
 
 	movieHandler := handlers.NewMovieHandler(mdb)
 
-	http.HandleFunc("/health", handlers.HealthHandler)
-	http.HandleFunc("/movies", movieHandler.MoviesHandler)
-	http.HandleFunc("/movie", movieHandler.GetRandomMovieHandler)
+	http.HandleFunc("GET /health", handlers.HealthHandler)
+	http.HandleFunc("GET /movies", movieHandler.MoviesHandler)
+	http.HandleFunc("GET /movie", movieHandler.GetRandomMovieHandler)
 	http.HandleFunc("POST /movie", movieHandler.AddMovie)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
