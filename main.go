@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 
@@ -22,6 +23,11 @@ func main() {
 		log.Println("No .env file found, reading from OS environment")
 	}
 
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = "8081"
+	}
+
 	mdb, err = db.Connect()
 
 	if err != nil {
@@ -37,5 +43,5 @@ func main() {
 	http.HandleFunc("/movie", sp.ValidateApiKey(movieHandler.GetRandomMovieHandler))
 	http.HandleFunc("POST /movie", sp.ValidateApiKey(movieHandler.AddMovie))
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }
