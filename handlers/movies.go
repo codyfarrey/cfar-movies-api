@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"cfar-movies-api/models"
 	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/codyfarrey/cfar-movies-api/models"
 )
 
 type MovieHandler struct {

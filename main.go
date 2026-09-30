@@ -9,8 +9,9 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"cfar-movies-api/db"
-	"cfar-movies-api/handlers"
+	"github.com/codyfarrey/cfar-movies-api/db"
+	"github.com/codyfarrey/cfar-movies-api/handlers"
+	"github.com/codyfarrey/cfar-movies-api/security"
 )
 
 var mdb *sql.DB
@@ -29,11 +30,12 @@ func main() {
 	defer mdb.Close()
 
 	movieHandler := handlers.NewMovieHandler(mdb)
+	sp := security.NewSecurityPayload()
 
 	http.HandleFunc("/health", handlers.HealthHandler)
-	http.HandleFunc("/movies", movieHandler.MoviesHandler)
-	http.HandleFunc("/movie", movieHandler.GetRandomMovieHandler)
-	http.HandleFunc("POST /movie", movieHandler.AddMovie)
+	http.HandleFunc("/movies", sp.ValidateApiKey(movieHandler.MoviesHandler))
+	http.HandleFunc("/movie", sp.ValidateApiKey(movieHandler.GetRandomMovieHandler))
+	http.HandleFunc("POST /movie", sp.ValidateApiKey(movieHandler.AddMovie))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

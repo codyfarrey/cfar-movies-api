@@ -19,6 +19,11 @@ func Connect() (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", connStr)
 
+	pingErr := db.Ping()
+	if pingErr != nil {
+		log.Fatal("Unable to connect to database: ", pingErr)
+	}
+
 	log.Println("Connected to database!")
 
 	return db, err
