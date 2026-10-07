@@ -19,7 +19,7 @@ func NewMovieHandler(db *sql.DB) *MovieHandler {
 
 func (h *MovieHandler) MoviesHandler(rw http.ResponseWriter, req *http.Request) {
 	log.Print("Returning all movies from database...")
-	rows, err := h.DB.Query("SELECT tmdb_id, title, release_date, genres FROM movies")
+	rows, err := h.DB.Query("SELECT id, title, release_date, genres FROM movies")
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
@@ -69,7 +69,7 @@ func (h *MovieHandler) AddMovie(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (h *MovieHandler) GetRandomMovieHandler(rw http.ResponseWriter, req *http.Request) {
-	row := h.DB.QueryRow("SELECT tmdb_id, title, release_date, genres FROM movies ORDER BY RANDOM() LIMIT 1")
+	row := h.DB.QueryRow("SELECT id, title, release_date, genres FROM movies ORDER BY RANDOM() LIMIT 1")
 
 	var m models.Movie
 	err := row.Scan(&m.ID, &m.Title, &m.ReleaseDate, &m.Genres)
