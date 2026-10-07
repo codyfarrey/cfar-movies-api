@@ -42,6 +42,7 @@ func main() {
 	http.HandleFunc("/movies", sp.ValidateApiKey(movieHandler.MoviesHandler))
 	http.HandleFunc("/movie", sp.ValidateApiKey(movieHandler.GetRandomMovieHandler))
 	http.HandleFunc("POST /movie", sp.ValidateApiKey(movieHandler.AddMovie))
+	http.HandleFunc("GET /movies/{id}", sp.ValidateApiKey(movieHandler.GetMovieByIdHandler))
 
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }

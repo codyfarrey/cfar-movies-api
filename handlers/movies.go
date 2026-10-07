@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/codyfarrey/cfar-movies-api/models"
 )
@@ -82,5 +83,29 @@ func (h *MovieHandler) GetRandomMovieHandler(rw http.ResponseWriter, req *http.R
 		return
 	}
 
+	json.NewEncoder(rw).Encode(m)
+}
+
+func (h *MovieHandler) GetMovieByIdHandler(rw http.ResponseWriter, req *http.Request) {
+	idStr := req.PathValue("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(rw, "invalid movie id", http.StatusBadRequest)
+		return
+	}
+
+	var m models.Movie
+	row := h.DB.QueryRow("SELECT id, title, release_date, genres FROM movies WHERE id = $1", id)
+	err = row.Scan(&m.ID, &m.Title, &m.ReleaseDate, &m.Genres)
+	if err == sql.ErrNoRows {
+		http.Error(rw, "movie not found", http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(m)
 }
