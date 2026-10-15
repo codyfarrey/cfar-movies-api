@@ -13,7 +13,7 @@ func Connect() (*sql.DB, error) {
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 
-	fmt.Printf("Connecting to database: [%s] as user: [%s]\n", dbname, user)
+	fmt.Printf("connecting to database: [%s] as user: [%s]\n", dbname, user)
 
 	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbname)
 
@@ -21,10 +21,8 @@ func Connect() (*sql.DB, error) {
 
 	pingErr := db.Ping()
 	if pingErr != nil {
-		log.Fatal("Unable to connect to database: ", pingErr)
+		log.Fatal("unable to connect to database: ", pingErr)
 	}
-
-	log.Println("Connected to database!")
 
 	return db, err
 }

@@ -20,7 +20,7 @@ var mdb *sql.DB
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("No .env file found, reading from OS environment")
+		log.Println("no .env file found, reading from OS environment")
 	}
 
 	serverPort := os.Getenv("SERVER_PORT")
@@ -31,7 +31,7 @@ func main() {
 	mdb, err = db.Connect()
 
 	if err != nil {
-		log.Fatal("Unable to connect to database: ", err)
+		log.Fatal("unable to connect to database: ", err)
 	}
 	defer mdb.Close()
 
@@ -43,6 +43,6 @@ func main() {
 	http.HandleFunc("/movie", sp.ValidateApiKey(movieHandler.GetRandomMovieHandler))
 	http.HandleFunc("POST /movie", sp.ValidateApiKey(movieHandler.AddMovie))
 	http.HandleFunc("GET /movies/{id}", sp.ValidateApiKey(movieHandler.GetMovieByIdHandler))
-
+	log.Printf("starting server on port [%s]...", serverPort)
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }
