@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.*
+*.md
+*.exe
+Dockerfile
+.dockerignore
+compose.yaml
+Caddyfile
+db-init

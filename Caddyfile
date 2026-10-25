@@ -1,0 +1,3 @@
+api.cfar.dev {
+	reverse_proxy movies-api:8081
+}

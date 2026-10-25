@@ -1,0 +1,65 @@
+name: cfar-movies-api
+
+# Docker's default json-file driver never rotates logs and will eventually
+# fill the disk.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # The only service that publishes ports to the internet.
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # certificates live here; don't delete this volume
+      - caddy_config:/config
+    networks:
+      - edge
+    depends_on:
+      - movies-api
+    logging: *default-logging
+
+  movies-api:
+    build: .
+    image: cfar-movies-api:local
+    restart: unless-stopped
+    # Non-secret settings live here. Secrets (DB_PASSWORD, API_KEY) come from a
+    # root-owned file outside the repo. DB_PASSWORD must equal
+    # MOVIES_API_DB_PASSWORD in the infra repo's db.env.
+    environment:
+      DB_HOST: postgres # the service name in the infra repo's compose file
+      DB_USER: movies_api
+      DB_NAME: movies
+    env_file:
+      - /etc/cinecipher/movies-api.env
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - edge
+      - database
+    # No depends_on for the database: it lives in another compose project.
+    # If Postgres isn't up yet, the API exits and restart: unless-stopped
+    # retries until it is.
+    logging: *default-logging
+
+networks:
+  edge: # caddy <-> movies-api
+  # Created and owned by the infra repo; start that stack first.
+  database:
+    external: true
+    name: cinecipher-database
+
+volumes:
+  caddy_data:
+  caddy_config:
